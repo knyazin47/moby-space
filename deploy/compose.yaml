@@ -1,0 +1,34 @@
+name: moby-local
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: moby-local-api:${MOBY_IMAGE_TAG:-dev}
+    restart: "no"
+    user: "65532:65532"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.50
+    stop_grace_period: 15s
+    environment:
+      MOBY_ADDR: 0.0.0.0:8080
+      MOBY_GRPC_ADDR: 0.0.0.0:9090
+      MOBY_DATABASE: /data/family.sqlite
+      MOBY_BOOTSTRAP_SECRET: ${MOBY_BOOTSTRAP_SECRET:?Set a local bootstrap secret in deploy/.env}
+      MOBY_BUSINESS_DATE: ${MOBY_BUSINESS_DATE:-}
+    volumes:
+      - data:/data
+    ports:
+      - "127.0.0.1:${MOBY_REST_PORT:-18080}:8080"
+      - "127.0.0.1:${MOBY_GRPC_PORT:-19090}:9090"
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+volumes:
+  data:

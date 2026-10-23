@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "brand": "МТБанк",
+  "approved_for": "new screens only",
+  "decision_date": "2026-10-20",
+  "theme_mode": "light",
+  "legacy_policy": "preserve existing routes, behavior and isolated light theme tokens; replace bank-original graphics and app icons with redistributable project or open-source assets",
+  "palette_source_slide": 27,
+  "palette": {
+    "mt_red": "#E42C26",
+    "mt_orange": "#FF5912",
+    "mt_blue": "#2334C8",
+    "white": "#FFFFFF",
+    "black": "#141416",
+    "mt_cloud_blue": "#E7F4FF",
+    "mt_sky_blue": "#97CFFF",
+    "mt_soft_blue": "#82AED3"
+  },
+  "accent_proportions": {
+    "scope": "accents, logo and graphic elements; not total UI screen area",
+    "mt_red": 20,
+    "mt_orange": 20,
+    "mt_blue": 60
+  },
+  "combination_rules": {
+    "blue_and_red_without_orange": "allowed",
+    "blue_and_orange_without_red": "not allowed"
+  },
+  "typography": {
+    "source_slide": 28,
+    "display_family": "TikTok Sans",
+    "body_family": "Inter",
+    "font_files_embedded_in_source": false,
+    "runtime_tiktok_sans_status": "bundled authoritative Google Fonts source at 2750b521bd22ce141f12617194ab0e04cf5d12d5; OFL-1.1; Cyrillic verified; see frontend/assets/brand/fonts/source.json"
+  },
+  "graphics": {
+    "source_slide": 29,
+    "base_element": "Лучи из логотипа",
+    "additional_elements": [
+      "Фрактальное стекло",
+      "Стеклянные примитивы"
+    ]
+  },
+  "imagery": {
+    "source_slides": [
+      30,
+      31
+    ],
+    "direction": "natural, realistic people/materials/light; avoid cartoon, CGI and visibly artificial poses"
+  },
+  "logo": {
+    "source_slides": [
+      24,
+      25
+    ],
+    "editable_original_available": false,
+    "rule": "use an approved original artwork; do not trace or redraw from the slide"
+  },
+  "ui_mapping_status": "route-scoped light Flutter theme implemented: mt_brand_theme.dart; headings TikTokSans, body Inter; legacy theme preserved"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "icon": "account_balance_wallet",
+  "upstream_commit": "10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7",
+  "upstream_url": "https://raw.githubusercontent.com/google/material-design-icons/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7/src/action/account_balance_wallet/materialicons/24px.svg",
+  "source_path": "tools/assets/material/account_balance_wallet.svg",
+  "source_sha256": "0b9a955051b23d039a1d996881455b32db8eedb07f56db6317683d71a2b94075",
+  "license": "Apache-2.0",
+  "license_file": "tools/assets/licenses/Material-Icons-Apache-2.0.txt",
+  "license_sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+  "notice_file": "tools/assets/licenses/Material-Icons-NOTICE.txt",
+  "public_distribution": "eligible"
+}

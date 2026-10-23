@@ -1,0 +1,152 @@
+name: Moby Space Android and iOS
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Optional API URI; empty uses the local replica (repository variable is the fallback)'
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: moby-mobile-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  MOBY_API_URL: ${{ inputs.api_url || vars.MOBY_API_URL || '' }}
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.27.3'
+          cache-dependency-path: backend/go.sum
+      - name: Check backend including race detector
+        working-directory: backend
+        run: |
+          go vet ./...
+          go test -race ./...
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            runner: ubuntu-24.04
+            artifact_path: frontend/build/mobile-release/*
+          - platform: ios
+            runner: macos-15-intel
+            artifact_path: frontend/build/ios/moby-unsigned/*
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: '3.44.6'
+          channel: stable
+          cache: true
+      - name: Use JDK 17
+        if: matrix.platform == 'android'
+        run: echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+      - name: Verify release tag matches application version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYVERSION'
+          import os,re
+          version=re.search(r'^version: (.+)$',open('frontend/pubspec.yaml').read(),re.M)[1].split('+')[0]
+          assert os.environ['TAG']=='v'+version, 'Tag must match pubspec application version'
+          PYVERSION
+      - name: Verify source assets
+        run: |
+          python3 tools/check_assets.py
+          python3 -m unittest discover -s tools -p 'test_build_config.py'
+          python3 tools/check_ios_artifacts.py --self-test
+      - name: Resolve locked dependencies
+        working-directory: frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Verify source and replica tests
+        working-directory: frontend
+        run: |
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze --fatal-infos
+          flutter test --machine > "$RUNNER_TEMP/moby-build-tests.jsonl"
+          python3 - <<'PYTEST'
+          import json,os
+          rows=[json.loads(line) for line in open(os.path.join(os.environ['RUNNER_TEMP'],'moby-build-tests.jsonl')) if line.startswith('{')]
+          passed=sum(1 for row in rows if row.get('type')=='testDone' and row.get('result')=='success' and not row.get('hidden') and not row.get('skipped'))
+          assert any(row.get('type')=='done' and row.get('success') for row in rows)
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write(f'MOBY_VERIFIED_TEST_COUNT={passed}\n')
+          PYTEST
+      - name: Verify configured family routing
+        working-directory: frontend
+        run: flutter test test/server test/design/space_preview_test.dart test/design/children_tab_preview_test.dart --dart-define=MOBY_API_URL=https://api.example.invalid
+      - name: Select Android signing identity
+        if: matrix.platform == 'android'
+        env:
+          MOBY_KEYSTORE_BASE64: ${{ secrets.MOBY_ANDROID_KEYSTORE_BASE64 }}
+          MOBY_SIGNING_PASSWORD: ${{ secrets.MOBY_ANDROID_SIGNING_PASSWORD }}
+        run: |
+          python3 - <<'PYSIGN'
+          import base64,os,pathlib
+          encoded=os.environ['MOBY_KEYSTORE_BASE64']
+          password=os.environ['MOBY_SIGNING_PASSWORD']
+          assert bool(encoded)==bool(password), 'Configure both permanent signing secrets or neither'
+          if not encoded:
+            with open(os.environ['GITHUB_ENV'],'a') as f:f.write('MOBY_ANDROID_SIGNING_MODE=ephemeral\n')
+            raise SystemExit(0)
+          path=pathlib.Path(os.environ['RUNNER_TEMP'])/'moby-release.p12'
+          path.write_bytes(base64.b64decode(encoded,validate=True))
+          path.chmod(0o600)
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write(f'MOBY_ANDROID_STORE_FILE={path}\nMOBY_ANDROID_SIGNING_MODE=permanent\n')
+          PYSIGN
+      - name: Build Android release
+        if: matrix.platform == 'android'
+        env:
+          MOBY_ANDROID_STORE_PASSWORD: ${{ secrets.MOBY_ANDROID_SIGNING_PASSWORD }}
+        run: bash tools/build_android_release.sh
+      - name: Build iOS unsigned device IPA
+        if: matrix.platform == 'ios'
+        run: bash tools/build_ios_unsigned.sh
+      - name: Remove temporary Android signing material
+        if: always() && matrix.platform == 'android'
+        run: python3 -c "import os,pathlib; (pathlib.Path(os.environ['RUNNER_TEMP'])/'moby-release.p12').unlink(missing_ok=True)"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: moby-space-${{ matrix.platform }}
+          path: ${{ matrix.artifact_path }}
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build, backend]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          path: release-files
+          merge-multiple: true
+      - name: Attach verified APK and IPA to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          python3 tools/prepare_mobile_release.py release-files "$RUNNER_TEMP/moby-publish" --commit "$GITHUB_SHA" --tag "$TAG" --api-url "$MOBY_API_URL"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --target "$GITHUB_SHA" --prerelease --title "Moby Space $TAG" --notes "Android APK и unsigned iOS IPA. Режим и Android signing identity указаны в manifests. Ephemeral APK не гарантирует обновление других сборок; iPhone требует переподпись. Только синтетические данные; физические устройства проверяются отдельно."
+          fi
+          gh release upload "$TAG" "$RUNNER_TEMP/moby-publish/"*

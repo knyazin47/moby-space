@@ -1,0 +1,71 @@
+name: moby_demo
+description: Local clickable Moby interface replica with synthetic data.
+publish_to: none
+version: 1.6.0+18
+environment:
+  sdk: ^3.12.2
+  flutter: '>=3.44.6'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: 3.4.3
+  go_router: 18.1.0
+  intl: 0.20.2
+  qr_flutter: ^4.1.0
+  flutter_secure_storage: 11.2.0
+  mobile_scanner: 7.4.2
+  grpc: 5.2.0
+  protobuf: 6.1.0
+  fixnum: 1.1.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: 6.0.0
+  protoc_plugin: 25.1.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/brand/family-intro-glass.webp
+    - assets/brand/family-space/
+    - assets/brand/family-space/rebrand-v3/
+    - assets/emoji/
+    - assets/emoji/tabs/
+  fonts:
+    - family: TikTokSans
+      fonts:
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 100
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 400
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 500
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 600
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 700
+        - asset: assets/brand/fonts/TikTokSans.ttf
+          weight: 900
+    - family: Inter
+      fonts:
+        - asset: assets/reference/font/inter_extra_light.ttf
+          weight: 200
+        - asset: assets/reference/font/inter_regular.ttf
+          weight: 400
+        - asset: assets/reference/font/inter_medium.ttf
+          weight: 500
+        - asset: assets/reference/font/inter_semi_bold.ttf
+          weight: 600
+        - asset: assets/reference/font/inter_bold.ttf
+          weight: 700
+    - family: Montserrat
+      fonts:
+        - asset: assets/reference/font/montserrat_regular.ttf
+          weight: 400
+        - asset: assets/reference/font/montserrat_medium.ttf
+          weight: 500
+        - asset: assets/reference/font/montserrat_semi_bold.ttf
+          weight: 600
+        - asset: assets/reference/font/montserrat_bold.ttf
+          weight: 700

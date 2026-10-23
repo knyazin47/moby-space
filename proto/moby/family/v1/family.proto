@@ -1,0 +1,316 @@
+syntax = "proto3";
+package moby.family.v1;
+option go_package = "moby.local/family/gen/moby/family/v1;familyv1";
+
+// Native protobuf contract. Tokens, hashes, command fingerprints and storage
+// internals are deliberately absent from snapshots and session summaries.
+service FamilyService {
+ rpc LoginAdult(LoginAdultRequest) returns (SessionGrant);
+ rpc Logout(Empty) returns (Empty);
+ rpc GetSnapshot(Empty) returns (Snapshot);
+ rpc WatchSnapshots(Empty) returns (stream Snapshot);
+ rpc CompleteFamilyIntro(Empty) returns (Snapshot);
+ rpc ListChildren(Empty) returns (ChildrenList);
+ rpc GetChild(ChildRef) returns (Child);
+ rpc CreateChild(CreateChildRequest) returns (Child);
+ rpc UpdateChild(UpdateChildRequest) returns (Child);
+ rpc UpdatePolicy(UpdatePolicyRequest) returns (Child);
+ rpc ArchiveChild(ChildRef) returns (Child);
+ rpc VerifyChild(VerifyChildRequest) returns (Child);
+ rpc OpenProduct(OpenProductRequest) returns (Child);
+ rpc Purchase(ChildMoneyRequest) returns (Operation);
+ rpc TopUp(ChildMoneyRequest) returns (Operation);
+ rpc DecideOperation(DecideOperationRequest) returns (Operation);
+ rpc CreatePairing(CreatePairingRequest) returns (PairingCreated);
+ rpc ConsumePairing(ConsumePairingRequest) returns (PairingResult);
+ rpc PollPairing(PairingSecretRequest) returns (PairingPoll);
+ rpc CancelPairing(PairingSecretRequest) returns (PairingResult);
+ rpc ListSessions(Empty) returns (SessionsList);
+ rpc RevokeSession(SessionRef) returns (Empty);
+ rpc ExecuteFamilySpaceCommand(SpaceCommand) returns (Snapshot);
+}
+message Empty {}
+message DomainErrorDetail { int32 semantic_status = 1; string code = 2; }
+message LoginAdultRequest { optional string bootstrap_secret = 1; optional string device_name = 2; }
+message SessionGrant { optional string token = 1; Actor actor = 2; optional int64 expires_at = 3; }
+message ChildRef { optional string child_id = 1; }
+message SessionRef { optional string session_id = 1; }
+message CreateChildRequest { optional string display_name = 1; optional string legal_name = 2; optional string date_of_birth = 3; optional string idempotency_key = 4; }
+message ChildPatch { optional string display_name = 1; optional string legal_name = 2; optional string date_of_birth = 3; optional string card_status = 4; }
+message UpdateChildRequest { optional string child_id = 1; ChildPatch patch = 2; }
+message UpdatePolicyRequest { optional string child_id = 1; Policy policy = 2; }
+message VerifyChildRequest { optional string child_id = 1; optional string outcome = 2; }
+message OpenProductRequest { optional string child_id = 1; optional string agreement_version = 2; optional bool signer_consent = 3; }
+message MoneyInput { optional int64 amount_minor = 1; optional string currency = 2; optional string channel = 3; optional string category = 4; optional string merchant = 5; optional string idempotency_key = 6; }
+message ChildMoneyRequest { optional string child_id = 1; MoneyInput input = 2; }
+message DecideOperationRequest { optional string operation_id = 1; optional bool approve = 2; }
+message ChildrenList { repeated Child children = 1; }
+message CreatePairingRequest { optional string device_name = 1; }
+message ConsumePairingRequest { optional string code = 1; optional string child_id = 2; }
+message PairingSecretRequest { optional string pairing_id = 1; optional string request_secret = 2; }
+message PairingCreated { optional string id = 1; optional string code = 2; optional string request_secret = 3; optional int64 expires_at = 4; optional string status = 5; }
+message PairingResult { optional string id = 1; optional string status = 2; optional string child_id = 3; }
+message PairingPoll { optional string status = 1; SessionGrant session = 2; }
+message SessionSummary { optional string id = 1; optional string role = 2; optional string child_id = 3; optional string device_name = 4; optional int64 expires_at = 5; optional bool revoked = 6; }
+message SessionsList { repeated SessionSummary sessions = 1; }
+// Wrapper distinguishes an omitted category policy from an explicitly empty one.
+message CategoryRules { map<string, bool> values = 1; }
+
+message Policy {
+ CategoryRules categories = 1;
+ optional bool payments = 2;
+ optional bool transfers = 3;
+ optional bool internet = 4;
+ optional int64 daily_limit = 5;
+ optional int64 monthly_limit = 6;
+ optional int64 approval_threshold = 7;
+}
+
+message Child {
+ optional string id = 1;
+ optional string display_name = 2;
+ optional string legal_name = 3;
+ optional string date_of_birth = 4;
+ optional string identity_status = 5;
+ optional string representation_status = 6;
+ optional string agreement_status = 7;
+ optional string account_status = 8;
+ optional string card_status = 9;
+ optional string device_access_status = 10;
+ optional string membership_status = 11;
+ Policy policy = 12;
+ optional int64 balance_minor = 13;
+ optional string currency = 14;
+ optional string agreement_version = 15;
+ optional string signer_id = 16;
+ optional int64 signed_at = 17;
+ optional int64 version = 18;
+}
+
+message Actor {
+ optional string id = 1;
+ optional string role = 2;
+ optional string child_id = 3;
+ optional string session_id = 4;
+}
+
+message AdultPreferences {
+ optional bool family_intro_seen = 1;
+}
+
+message Snapshot {
+ FamilySpaceSnapshot family_space = 1;
+ optional int64 revision = 2;
+ Actor actor = 3;
+ AdultPreferences preferences = 4;
+ repeated Child children = 5;
+ repeated Operation operations = 6;
+ optional bool synthetic = 7;
+ optional string business_date = 8;
+}
+
+message Operation {
+ optional string id = 1;
+ optional string child_id = 2;
+ optional string kind = 3;
+ optional int64 amount_minor = 4;
+ optional string currency = 5;
+ optional string channel = 6;
+ optional string category = 7;
+ optional int64 completed_at = 8;
+ optional string merchant = 9;
+ optional string status = 10;
+ optional int64 created_at = 11;
+ optional int64 version = 12;
+ optional bool decision = 13;
+}
+
+message Wallet {
+ optional int64 available_minor = 1;
+ optional int64 reserved_minor = 2;
+ optional string currency = 3;
+}
+
+message Goal {
+ optional string id = 1;
+ optional string child_id = 2;
+ optional string title = 3;
+ optional int64 target_minor = 4;
+ optional int64 saved_minor = 5;
+ optional int64 matched_minor = 6;
+ optional int64 net_deposits_minor = 7;
+ optional int64 matched_basis_minor = 8;
+ optional int64 matching_available_minor = 9;
+ optional string matching_status = 10;
+}
+
+message FamilyTask {
+ optional string cancel_reason = 1;
+ optional string id = 2;
+ optional string child_id = 3;
+ optional string title = 4;
+ optional int64 reward_minor = 5;
+ optional string status = 6;
+ optional bool cancel_requested = 7;
+}
+
+message Errand {
+ optional string cancel_reason = 1;
+ optional bool reward_reserved = 2;
+ optional bool expense_recorded = 3;
+ optional string id = 4;
+ optional string child_id = 5;
+ optional string title = 6;
+ optional int64 budget_minor = 7;
+ optional int64 reward_minor = 8;
+ optional int64 actual_minor = 9;
+ optional int64 returned_minor = 10;
+ optional string funding = 11;
+ optional string status = 12;
+ optional bool return_confirmed = 13;
+ optional bool own_money_consent = 14;
+ optional bool cancel_requested = 15;
+}
+
+message Allowance {
+ optional string id = 1;
+ optional string child_id = 2;
+ optional string title = 3;
+ optional int64 amount_minor = 4;
+ optional string frequency = 5;
+ repeated int32 weekdays = 6;
+ optional int32 month_day = 7;
+ optional string next_date = 8;
+ optional int32 retry_limit = 9;
+ optional bool active = 10;
+}
+
+message Installment {
+ optional int32 retry_limit = 1;
+ optional string id = 2;
+ optional string child_id = 3;
+ optional string allowance_id = 4;
+ optional string due_date = 5;
+ optional int64 amount_minor = 6;
+ optional string status = 7;
+ optional int32 attempts = 8;
+ optional string last_attempt_date = 9;
+}
+
+message SpaceSettings {
+ optional bool matching_enabled = 1;
+ optional int64 matching_percent = 2;
+ optional int64 matching_cap_minor = 3;
+ optional bool notifications = 4;
+ optional bool tasks_enabled = 5;
+ optional bool errands_enabled = 6;
+ optional bool learning_enabled = 7;
+}
+
+message FamilyRequest {
+ optional int64 amount_minor = 1;
+ optional string id = 2;
+ optional string child_id = 3;
+ optional string kind = 4;
+ optional string title = 5;
+ Policy policy = 6;
+ optional string status = 7;
+}
+
+message Lesson {
+ optional string question = 1;
+ repeated string options = 2;
+ optional string id = 3;
+ optional string title = 4;
+ optional string body = 5;
+ optional string skill = 6;
+}
+
+message LessonCompletion {
+ optional string child_id = 1;
+ optional string lesson_id = 2;
+ optional int64 completed_at = 3;
+}
+
+message SpaceEntry {
+ optional string id = 1;
+ optional string child_id = 2;
+ optional string kind = 3;
+ optional int64 amount_minor = 4;
+ optional int64 at = 5;
+ optional string entity_id = 6;
+}
+
+message WeeklyOverview {
+ optional string child_id = 1;
+ optional string since = 2;
+ optional int64 incoming_minor = 3;
+ optional int64 spent_minor = 4;
+ optional int64 saved_minor = 5;
+ optional int32 tasks_completed = 6;
+ optional int32 lessons_completed = 7;
+}
+
+message FamilyCapabilities {
+ optional bool synthetic = 1;
+ optional string currency = 2;
+ optional string time_zone = 3;
+ optional int64 max_amount_minor = 4;
+ optional string matching_cap_period = 5;
+ optional bool lessons_grant_permissions = 6;
+}
+
+message SpaceNotice {
+ optional string id = 1;
+ optional string child_id = 2;
+ optional string recipient = 3;
+ optional string title = 4;
+ optional string body = 5;
+ optional string kind = 6;
+ optional int64 created_at = 7;
+ optional bool read = 8;
+ optional bool mandatory = 9;
+}
+
+message FamilySpaceSnapshot {
+ repeated SpaceEntry activity = 1;
+ repeated SpaceNotice notices = 2;
+ FamilyCapabilities capabilities = 3;
+ Wallet adult_wallet = 4;
+ repeated Goal goals = 5;
+ repeated FamilyTask tasks = 6;
+ repeated Errand errands = 7;
+ repeated Allowance allowances = 8;
+ repeated Installment installments = 9;
+ repeated FamilyRequest requests = 10;
+ map<string, SpaceSettings> settings = 11;
+ repeated LessonCompletion learning = 12;
+ repeated Lesson lessons = 13;
+ repeated WeeklyOverview weekly = 14;
+}
+
+message SpaceCommand {
+ optional string reason = 1;
+ optional int32 answer_index = 2;
+ optional string type = 3;
+ optional string child_id = 4;
+ optional string entity_id = 5;
+ optional string title = 6;
+ optional int64 amount_minor = 7;
+ optional int64 budget_minor = 8;
+ optional int64 reward_minor = 9;
+ optional int64 target_minor = 10;
+ optional string action = 11;
+ optional string idempotency_key = 12;
+ optional string funding = 13;
+ optional bool own_money_consent = 14;
+ optional string frequency = 15;
+ repeated int32 weekdays = 16;
+ optional int32 month_day = 17;
+ optional string next_date = 18;
+ optional int32 retry_limit = 19;
+ SpaceSettings settings = 20;
+ Policy policy = 21;
+ optional string kind = 22;
+ optional bool approve = 23;
+}

@@ -1,0 +1,9 @@
+Emoji images and category artwork: Google/Noto Emoji and contributors.
+Vanniktech Emoji: Copyright (C) 2016 Niklas Baudy, Ruben Gees, Mario Đanić and contributors.
+Official upstream: https://github.com/vanniktech/Emoji/tree/a411844b60060174c7826ca9ec77035b8f18abb1
+License: Apache License, Version 2.0; see Emoji-Apache-2.0.txt.
+
+This application uses 64x64 crops of the upstream Google spritesheets,
+eight unchanged category icons, and two pixel-identical re-encoded controls.
+No bank APK or decompiled Java is needed to verify the image provenance.
+The original provider order and Unicode mappings are retained.

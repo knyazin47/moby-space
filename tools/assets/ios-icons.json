@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "source_path": "tools/assets/material/account_balance_wallet.svg",
+  "source_sha256": "0b9a955051b23d039a1d996881455b32db8eedb07f56db6317683d71a2b94075",
+  "license": "Apache-2.0",
+  "license_file": "tools/assets/licenses/Material-Icons-Apache-2.0.txt",
+  "notice_file": "tools/assets/licenses/Material-Icons-NOTICE.txt",
+  "public_distribution": "eligible",
+  "renderer": "CairoSVG 2.8.2; Pillow 12.0.0",
+  "transformation": "Unchanged official stock SVG rasterized at each native size. White complete icon canvas; centered transparent Android adaptive foreground padding.",
+  "outputs": [
+    {
+      "filename": "Icon-App-1024x1024@1x.png",
+      "size_px": 1024,
+      "sha256": "bfc724fba4277b6914b7822aa177980ea91fad6b559a1dfac848591d55340f43",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-20x20@1x.png",
+      "size_px": 20,
+      "sha256": "53356fc874c8fa0f3e06edf0024791c2076f865f98060be590cb9d9147413b0a",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-20x20@2x.png",
+      "size_px": 40,
+      "sha256": "de31a4c8b9907c4cce7ed43a0e79235fabcf17ea8d2dbb6550208021cb02d623",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-20x20@3x.png",
+      "size_px": 60,
+      "sha256": "9c681c6c0824f11331b715b4bcfdf3433c2e805ec77c2347320701ae1bb6adb5",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-29x29@1x.png",
+      "size_px": 29,
+      "sha256": "3b269613d083d80f12504f3fd37dcb870890eee03eae2d7c673712c6630a8361",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-29x29@2x.png",
+      "size_px": 58,
+      "sha256": "9decfc86ca5d200e8d69f3c0d4d87e75263c47c439c5ca662a9c02e0553ce631",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-29x29@3x.png",
+      "size_px": 87,
+      "sha256": "2997ba562d0ba672d0a29e0c94d284a8962825ed9e8b8744ccd4655db3dd85f1",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-40x40@1x.png",
+      "size_px": 40,
+      "sha256": "de31a4c8b9907c4cce7ed43a0e79235fabcf17ea8d2dbb6550208021cb02d623",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-40x40@2x.png",
+      "size_px": 80,
+      "sha256": "62a4be01a87409b461fbf8636457b92912e1179d4ae014977204830db2b0b989",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-40x40@3x.png",
+      "size_px": 120,
+      "sha256": "859130502c92e0d390b7407918e7083387b3430db63d659d65ff4fb49f8e6c16",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-60x60@2x.png",
+      "size_px": 120,
+      "sha256": "859130502c92e0d390b7407918e7083387b3430db63d659d65ff4fb49f8e6c16",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-60x60@3x.png",
+      "size_px": 180,
+      "sha256": "250afda375302b0388fd5b4c530283eb1dd6de064014e7aa4ce1dcd6e9add43f",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-76x76@1x.png",
+      "size_px": 76,
+      "sha256": "339fd768bc11c92d8f49913cb28c5cfd9937f1e6749a1ae8a3bc0397b0b4a584",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-76x76@2x.png",
+      "size_px": 152,
+      "sha256": "6ce44246537e0b054b31d3a8dc8e997d993204c138c7fc7d07db6f43ca7189e3",
+      "upscaled": false
+    },
+    {
+      "filename": "Icon-App-83.5x83.5@2x.png",
+      "size_px": 167,
+      "sha256": "d0d0b70ca02db4bde25a572dcf1c33e2968e05c238366bfaa6b9d84b3b436415",
+      "upscaled": false
+    }
+  ]
+}

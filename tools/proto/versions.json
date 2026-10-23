@@ -1,0 +1,21 @@
+{
+  "schema": "moby.family.v1",
+  "protoc": {
+    "version": "36.2",
+    "linux_x86_64_url": "https://github.com/protocolbuffers/protobuf/releases/download/v36.2/protoc-36.2-linux-x86_64.zip",
+    "sha256": "121f6c7afe1d4d0e3ea6aab9432038599250134cbf4474cb1167d2c7decd4278"
+  },
+  "go": {
+    "grpc": "1.84.0",
+    "protobuf": "1.36.12",
+    "protoc_gen_go": "1.36.12",
+    "protoc_gen_go_grpc": "1.6.2",
+    "x_net_security_floor": "0.60.0"
+  },
+  "dart": {
+    "grpc": "5.2.0",
+    "protobuf": "6.1.0",
+    "fixnum": "1.1.1",
+    "protoc_plugin": "25.1.0"
+  }
+}

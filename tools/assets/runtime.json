@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "boundary": "Bundled generated family art and independent open fonts; not a license for bank artwork or trademarks.",
+  "files": [
+    {
+      "path": "frontend/assets/brand/family-intro-glass.webp",
+      "sha256": "521876ebaeb3d3d1946734a4a8d171003fb72efa528b8575738893d7dc3c50fd",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/brand/family-space/reward-glass.webp",
+      "sha256": "cba26636084fb33a2e741dadcc8da0f1292fd947b843a1589da5a4e58a3f7ee2",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/brand/family-space/allowance-glass.webp",
+      "sha256": "a928b098b14557ea06348147c2a296a9d7bbec24d9a321b6ee651c8a8b5e53a2",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/brand/family-space/goal-glass.webp",
+      "sha256": "40b8c435f5974bcfbc17d4cb58cc6b84eb798167fd4be5fa51065fa04f7eea36",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/brand/fonts/TikTokSans.ttf",
+      "sha256": "0e7f0a3e924c9a86478fc6fc2946de2e4ab8fc704ed72ee40434ade94bb9b0c6",
+      "public_distribution": "eligible",
+      "group": "open_fonts",
+      "license": "OFL-1.1",
+      "license_file": "frontend/assets/brand/fonts/OFL.txt",
+      "source": "frontend/assets/brand/fonts/source.json"
+    },
+    {
+      "path": "frontend/assets/brand/family-space/rebrand-v3/wallet-glass.png",
+      "sha256": "d93f99a5396818947a2a2273b24314aa88e8e77e70ecc094fc7f277029a60441",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/brand/family-space/rebrand-v3/learning-glass.png",
+      "sha256": "b3790ff076d34c83f3744e32c97fbb0d9d5e742ca3285204dc7a0165976b6274",
+      "public_distribution": "eligible",
+      "group": "generated_family_art",
+      "source": "Project-generated GPT Images illustration; converted WebP where applicable; bank design references do not grant rights to bank trademarks.",
+      "license": "MIT",
+      "license_file": "LICENSE"
+    },
+    {
+      "path": "frontend/assets/fonts/Inter-Variable.ttf",
+      "sha256": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+      "public_distribution": "eligible",
+      "group": "open_fonts",
+      "license": "OFL-1.1",
+      "license_file": "frontend/assets/fonts/Inter-OFL.txt",
+      "source": {
+        "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf",
+        "git_blob": "047c92f6e2212473dc436020afed689527076d44",
+        "note": "Independent open-source upstream; exact bank font version not established."
+      }
+    },
+    {
+      "path": "frontend/assets/fonts/Montserrat-Variable.ttf",
+      "sha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+      "public_distribution": "eligible",
+      "group": "open_fonts",
+      "license": "OFL-1.1",
+      "license_file": "frontend/assets/fonts/Montserrat-OFL.txt",
+      "source": {
+        "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/montserrat/Montserrat%5Bwght%5D.ttf",
+        "git_blob": "c97aca18592834d8706549c279cb8d5ac5d85f69",
+        "note": "Independent open-source upstream; exact bank font version not established."
+      }
+    },
+    {
+      "path": "frontend/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "public_distribution": "eligible",
+      "group": "flutter_template_images",
+      "license": "BSD-3-Clause",
+      "license_file": "tools/assets/licenses/Flutter-BSD-3-Clause.txt",
+      "source": {
+        "url": "https://raw.githubusercontent.com/flutter/flutter/ee80f08bbf97172ec030b8751ceab557177a34a6/packages/flutter_tools/templates/module/ios/host_app_ephemeral/Runner.tmpl/Assets.xcassets/LaunchImage.imageset/LaunchImage.png",
+        "commit": "ee80f08bbf97172ec030b8751ceab557177a34a6",
+        "comparison": "byte-identical official template; 1x1 fully transparent RGBA pixel"
+      }
+    },
+    {
+      "path": "frontend/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "public_distribution": "eligible",
+      "group": "flutter_template_images",
+      "license": "BSD-3-Clause",
+      "license_file": "tools/assets/licenses/Flutter-BSD-3-Clause.txt",
+      "source": {
+        "url": "https://raw.githubusercontent.com/flutter/flutter/ee80f08bbf97172ec030b8751ceab557177a34a6/packages/flutter_tools/templates/module/ios/host_app_ephemeral/Runner.tmpl/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png",
+        "commit": "ee80f08bbf97172ec030b8751ceab557177a34a6",
+        "comparison": "byte-identical official template; 1x1 fully transparent RGBA pixel"
+      }
+    },
+    {
+      "path": "frontend/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+      "sha256": "93ae7d494fad0fb30cbf3ae746a39c4bc7a0f8bbf87fbb587a3f3c01f3c5ce20",
+      "public_distribution": "eligible",
+      "group": "flutter_template_images",
+      "license": "BSD-3-Clause",
+      "license_file": "tools/assets/licenses/Flutter-BSD-3-Clause.txt",
+      "source": {
+        "url": "https://raw.githubusercontent.com/flutter/flutter/ee80f08bbf97172ec030b8751ceab557177a34a6/packages/flutter_tools/templates/module/ios/host_app_ephemeral/Runner.tmpl/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png",
+        "commit": "ee80f08bbf97172ec030b8751ceab557177a34a6",
+        "comparison": "byte-identical official template; 1x1 fully transparent RGBA pixel"
+      }
+    }
+  ]
+}

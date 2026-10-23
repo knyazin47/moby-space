@@ -1,0 +1,9 @@
+Material Design Icons — Google and contributors.
+Official source: https://github.com/google/material-design-icons/tree/10ecc14790612ca8fd164e3f4ffe9c16fc50d5b7
+License: Apache License, Version 2.0; see Material-Icons-Apache-2.0.txt.
+
+The unchanged account_balance_wallet 24px SVG is used as a generic stock app icon.
+Native PNGs are rasterized at each platform size, with white canvas for complete
+icons and standard transparent padding for Android adaptive foregrounds.
+The adaptive icon XML only binds that stock artwork to a white background.
+No bank artwork, logo or trademark glyph is present in this icon.

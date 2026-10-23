@@ -1,0 +1,205 @@
+{
+  "assets": [
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Inter",
+        "2": "Bold",
+        "6": "Inter-Bold"
+      },
+      "font_weight": 700,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Inter-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/inter_bold.ttf",
+      "output_sha256": "d597e753e78d8bf9db34c13343146545fb3be5a1c99a175bc381fe3f6f787f31",
+      "public_distribution": "eligible",
+      "resource_name": "inter_bold",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Inter ExtraLight",
+        "2": "Regular",
+        "6": "Inter-ExtraLight"
+      },
+      "font_weight": 250,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Inter-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/inter_extra_light.ttf",
+      "output_sha256": "a95896c2a2e7d4edfb5ce3e977b404e9e374e4ede57340f5cda4c0b1e5709a67",
+      "public_distribution": "eligible",
+      "resource_name": "inter_extra_light",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Inter Medium",
+        "2": "Regular",
+        "6": "Inter-Medium"
+      },
+      "font_weight": 500,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Inter-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/inter_medium.ttf",
+      "output_sha256": "5249ae5f8ddfded34c98c6e3cf09e08f178f234e1bfa28a68f98f6f957628418",
+      "public_distribution": "eligible",
+      "resource_name": "inter_medium",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Inter",
+        "2": "Regular",
+        "6": "Inter-Regular"
+      },
+      "font_weight": 400,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Inter-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/inter_regular.ttf",
+      "output_sha256": "1041a8cf17dab7579acef0cc46b21f6497ec1ae01918ddc3495416efb81a4780",
+      "public_distribution": "eligible",
+      "resource_name": "inter_regular",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Inter SemiBold",
+        "2": "Regular",
+        "6": "Inter-SemiBold"
+      },
+      "font_weight": 600,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Inter-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/inter_semi_bold.ttf",
+      "output_sha256": "98542636e6c900d04e987ca7a37e160a407df344be073fb041fd88f2cd90085a",
+      "public_distribution": "eligible",
+      "resource_name": "inter_semi_bold",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Montserrat",
+        "2": "Bold",
+        "6": "Montserrat-Bold"
+      },
+      "font_weight": 700,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Montserrat-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/montserrat_bold.ttf",
+      "output_sha256": "846d5823e5c909a5aad49efbd71dd5f3320a8640fff86840bf7d529c8d8660a5",
+      "public_distribution": "eligible",
+      "resource_name": "montserrat_bold",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Montserrat Medium",
+        "2": "Regular",
+        "6": "Montserrat-Medium"
+      },
+      "font_weight": 500,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Montserrat-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/montserrat_medium.ttf",
+      "output_sha256": "7d557ed5f56b95c2be4a712e09c9636c864a5ec49bd124fe4f2973bee128ecfb",
+      "public_distribution": "eligible",
+      "resource_name": "montserrat_medium",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Montserrat",
+        "2": "Regular",
+        "6": "Montserrat-Regular"
+      },
+      "font_weight": 400,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Montserrat-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/montserrat_regular.ttf",
+      "output_sha256": "f5a3f02c4a72f1da11c6dadf4fd78c07b2f145a34ed46eb875ed0da28cbd348c",
+      "public_distribution": "eligible",
+      "resource_name": "montserrat_regular",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    },
+    {
+      "density": "unqualified",
+      "font_names": {
+        "1": "Montserrat SemiBold",
+        "2": "Regular",
+        "6": "Montserrat-SemiBold"
+      },
+      "font_weight": 600,
+      "license": "OFL-1.1",
+      "license_file": "tools/assets/licenses/Montserrat-reference-OFL.txt",
+      "output_path": "frontend/assets/reference/font/montserrat_semi_bold.ttf",
+      "output_sha256": "ef7b80ad18d3afab1c769972452d1e2e44c20ba12a7b1cb1c6d662525c8558ae",
+      "public_distribution": "eligible",
+      "resource_name": "montserrat_semi_bold",
+      "resource_type": "font",
+      "rights": "SIL Open Font License 1.1; embedded name table verified",
+      "source": "Original font files with embedded SIL Open Font License; exact bytes retained",
+      "transformations": [
+        "byte-for-byte copy"
+      ],
+      "type": "font"
+    }
+  ],
+  "rights": "SIL Open Font License 1.1",
+  "schema_version": 3,
+  "scope": "Nine open font files retained for exact existing typography; all bank-original UI artwork removed."
+}

@@ -1,0 +1,72 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.pfx
+*.db
+*.sqlite
+*.sqlite3
+*-wal
+*-shm
+*-journal
+
+# Local tools and temporary files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*~
+
+# Generated dependencies and build output
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+dist/
+build/
+coverage/
+
+# Flutter and Android local/generated files
+frontend/.dart_tool/
+frontend/.flutter
+frontend/.flutter-plugins-dependencies
+frontend/android/.gradle/
+frontend/android/local.properties
+frontend/android/key.properties
+*.jks
+*.keystore
+*.p12
+
+# Go binaries and persistent server data
+backend/bin/
+backend/data/
+
+# Locally collected bank application artifacts
+moby-apks-*/
+moby-apk-bundle/
+moby-installed-apks-*.zip
+moby-apk-bundle.zip
+*.apk
+*.apks
+*.aab
+tools/android-collector/.build/
+
+# Project-local pinned toolchains
+.tools/
+
+# Flutter analytics state on hosts without a home directory
+/.config/
+/frontend/.config/
+
+# IDE modules
+*.iml
+
+# Flutter tool marker on hosts without a home directory
+/.flutter

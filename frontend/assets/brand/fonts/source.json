@@ -1,0 +1,17 @@
+{
+  "family": "TikTok Sans",
+  "upstream": "https://github.com/tiktok/TikTokSans",
+  "source_commit": "2750b521bd22ce141f12617194ab0e04cf5d12d5",
+  "license": "OFL-1.1",
+  "files": {
+    "TikTokSans.ttf": {
+      "url": "https://raw.githubusercontent.com/google/fonts/2750b521bd22ce141f12617194ab0e04cf5d12d5/ofl/tiktoksans/TikTokSans%5Bopsz%2Cslnt%2Cwdth%2Cwght%5D.ttf",
+      "sha256": "0e7f0a3e924c9a86478fc6fc2946de2e4ab8fc704ed72ee40434ade94bb9b0c6"
+    },
+    "OFL.txt": {
+      "url": "https://raw.githubusercontent.com/google/fonts/2750b521bd22ce141f12617194ab0e04cf5d12d5/ofl/tiktoksans/OFL.txt",
+      "sha256": "99e743f68f5eac487004c73aaca69c5d80d91ddb7b75c04bdf5f39331d9b7158"
+    }
+  },
+  "cyrillic_verified": true
+}

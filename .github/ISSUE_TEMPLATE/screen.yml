@@ -1,0 +1,30 @@
+name: Экран или сценарий приложения
+description: Поведение, состояния и критерии готовности
+title: "[Сценарий] "
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Задача и участок приложения
+      description: Какую задачу решает экран? Укажите режим приложения и роль пользователя.
+    validations:
+      required: true
+  - type: textarea
+    id: states
+    attributes:
+      label: Состояния и действия
+      description: Вход → действие → ожидаемый результат → возврат. Укажите loading/empty/error, если применимо.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Приёмка
+      description: Проверяемый результат, устройство, размер экрана и масштаб текста.
+    validations:
+      required: true
+  - type: textarea
+    id: unknowns
+    attributes:
+      label: Открытые вопросы
+      description: Какие условия и ограничения ещё нужно определить?

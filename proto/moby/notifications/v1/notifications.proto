@@ -1,0 +1,78 @@
+syntax = "proto3";
+package moby.notifications.v1;
+option go_package = "moby.local/family/gen/moby/notifications/v1;notificationsv1";
+
+// Foundation only. No registration/delivery RPC, provider or OS permission flow
+// exists yet. These messages never authorize access to a family or an account.
+enum NotificationCategory {
+ NOTIFICATION_CATEGORY_UNSPECIFIED = 0;
+ NOTIFICATION_CATEGORY_MONEY = 1;
+ NOTIFICATION_CATEGORY_WORK = 2;
+ NOTIFICATION_CATEGORY_GOALS = 3;
+ NOTIFICATION_CATEGORY_LEARNING = 4;
+ NOTIFICATION_CATEGORY_SECURITY = 5;
+}
+enum NotificationKind {
+ NOTIFICATION_KIND_UNSPECIFIED = 0;
+ NOTIFICATION_KIND_DECISION_REQUIRED = 1;
+ NOTIFICATION_KIND_STATE_CHANGED = 2;
+ NOTIFICATION_KIND_SECURITY_ALERT = 3;
+}
+// Navigation is an allowlist. Never replace it with a provider-controlled URL.
+enum NotificationTarget {
+ NOTIFICATION_TARGET_UNSPECIFIED = 0;
+ NOTIFICATION_TARGET_FAMILY_OVERVIEW = 1;
+ NOTIFICATION_TARGET_CHILD_MONEY = 2;
+ NOTIFICATION_TARGET_CHILD_GOALS = 3;
+ NOTIFICATION_TARGET_CHILD_WORK = 4;
+ NOTIFICATION_TARGET_CHILD_RULES = 5;
+ NOTIFICATION_TARGET_CHILD_LEARNING = 6;
+}
+enum NotificationDeliveryStatus {
+ NOTIFICATION_DELIVERY_STATUS_UNSPECIFIED = 0;
+ NOTIFICATION_DELIVERY_STATUS_NOT_CONFIGURED = 1;
+ NOTIFICATION_DELIVERY_STATUS_PENDING = 2;
+ // Acceptance by a provider confirms neither device delivery nor reading.
+ NOTIFICATION_DELIVERY_STATUS_PROVIDER_ACCEPTED = 3;
+ NOTIFICATION_DELIVERY_STATUS_FAILED = 4;
+ NOTIFICATION_DELIVERY_STATUS_EXPIRED = 5;
+}
+
+// A future authenticated, actor-scoped source owns the monotonic sequence.
+// No financial amount, account/card details, body, title or credential belongs
+// in this event metadata. Opening it must re-fetch authorized application data.
+message NotificationEvent {
+ optional string event_id = 1;
+ optional string recipient_actor_id = 2;
+ optional string child_id = 3;
+ optional int64 sequence = 4;
+ optional NotificationKind kind = 5;
+ optional NotificationCategory category = 6;
+ optional NotificationTarget target = 7;
+ optional string entity_id = 8;
+ optional int64 created_at = 9;
+ optional int64 expires_at = 10;
+ optional bool mandatory = 11;
+}
+message NotificationPreferences {
+ optional string actor_id = 1;
+ optional int64 version = 2;
+ optional bool enabled = 3;
+ repeated NotificationCategory enabled_categories = 4;
+}
+// Opaque server references only. Token registration and platform/provider
+// credentials have no wire field and no persistence contract in this milestone.
+message NotificationInstallationRef {
+ optional string installation_id = 1;
+ optional string actor_id = 2;
+}
+message NotificationDeliveryEnvelope {
+ optional string event_id = 1;
+ optional string recipient_actor_id = 2;
+ NotificationInstallationRef installation = 3;
+}
+message NotificationDeliveryReceipt {
+ optional string event_id = 1;
+ optional string installation_id = 2;
+ optional NotificationDeliveryStatus status = 3;
+}

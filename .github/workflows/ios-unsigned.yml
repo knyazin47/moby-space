@@ -1,0 +1,50 @@
+name: Moby Space iOS unsigned
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Optional API URI; empty uses the local replica (repository variable is the fallback)'
+        type: string
+        required: false
+        default: ''
+env:
+  MOBY_API_URL: ${{ inputs.api_url || vars.MOBY_API_URL || '' }}
+permissions:
+  contents: read
+concurrency:
+  group: moby-ios-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ios:
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          flutter-version: '3.44.6'
+          channel: stable
+          cache: true
+      - name: Verify source assets and icon catalog
+        run: |
+          python3 tools/check_assets.py
+          python3 -m unittest discover -s tools -p 'test_build_config.py'
+          python3 tools/check_ios_artifacts.py --self-test
+      - name: Resolve locked dependencies
+        working-directory: frontend
+        run: flutter pub get --enforce-lockfile
+      - name: Check source
+        working-directory: frontend
+        run: |
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze --fatal-infos
+          flutter test
+          flutter test test/server test/design/space_preview_test.dart test/design/children_tab_preview_test.dart --dart-define=MOBY_API_URL=https://api.example.invalid
+      - name: Build physical-device unsigned IPA
+        run: bash tools/build_ios_unsigned.sh
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: moby-space-ios-unsigned
+          path: frontend/build/ios/moby-unsigned/*
+          if-no-files-found: error
+          retention-days: 7

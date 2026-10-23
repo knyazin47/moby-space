@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "docs/assets/screenshots/child-goals.png",
+      "sha256": "689a8f570988cea823a1a37dbf0729068b1e9dcf42b0273325cc5b2282df7750",
+      "group": "project_screenshot",
+      "public_distribution": "eligible",
+      "rights_basis": "Кадр интерфейса проекта из Flutter widget test с синтетической in-memory fixture. Исходные ресурсы проверяются отдельными реестрами приложения."
+    },
+    {
+      "path": "docs/assets/screenshots/child-learning.png",
+      "sha256": "204e4eb52b04b531e1961877300ee28b752247d8aeac1a212f4ad9cba96d8fcd",
+      "group": "project_screenshot",
+      "public_distribution": "eligible",
+      "rights_basis": "Кадр интерфейса проекта из Flutter widget test с синтетической in-memory fixture. Исходные ресурсы проверяются отдельными реестрами приложения."
+    },
+    {
+      "path": "docs/assets/screenshots/family-overview.png",
+      "sha256": "1b664c2eb3c96d7dd01c6c0ccc442edc491a44f9f27065b33e4dceb81b59d99a",
+      "group": "project_screenshot",
+      "public_distribution": "eligible",
+      "rights_basis": "Кадр интерфейса проекта из Flutter widget test с синтетической in-memory fixture. Исходные ресурсы проверяются отдельными реестрами приложения."
+    },
+    {
+      "path": "docs/assets/screenshots/replica-home.png",
+      "sha256": "ff6d3839275349636f2037907c60d26be3315e5743d3320a7f3c8b2a01086576",
+      "group": "project_screenshot",
+      "public_distribution": "eligible",
+      "rights_basis": "Кадр интерфейса проекта из Flutter widget test с синтетической in-memory fixture. Исходные ресурсы проверяются отдельными реестрами приложения."
+    },
+    {
+      "path": "docs/assets/team/prototype-on-phone.jpg",
+      "sha256": "0ea844adec383441bce92a912afcc5d0f9de6de2a4bc4be97e215fb6cb745997",
+      "group": "team_photo",
+      "public_distribution": "eligible",
+      "rights_basis": "Фотография предоставлена участником проекта с разрешением включить её в README. Разрешение ограничено этим использованием; фотография не перелицензирована под MIT."
+    },
+    {
+      "path": "docs/assets/team/team-at-hackathon.jpg",
+      "sha256": "77fc6cee76f429021850af9901aceb43caa2d0b596084af86722c38175aa1ea2",
+      "group": "team_photo",
+      "public_distribution": "eligible",
+      "rights_basis": "Фотография предоставлена участником проекта с разрешением включить её в README. Разрешение ограничено этим использованием; фотография не перелицензирована под MIT."
+    }
+  ]
+}

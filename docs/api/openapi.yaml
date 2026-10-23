@@ -1,0 +1,2038 @@
+openapi: 3.1.0
+info:
+  title: Moby synthetic family service
+  version: 0.2.0
+  description: Runnable synthetic-only family service. No real documents, bank/SMS/KYC/payment
+    integration. Strict JSON bodies <=8192bytes; bounded values/rate attempts. Bearer
+    sessions expire after7days; credentials hashed at rest. SQLite transaction commits
+    state+revision before SSE. Bind loopback by default; external access requires
+    operator TLS reverse proxy.
+servers:
+- url: http://127.0.0.1:8080
+security:
+- bearerAuth: []
+paths:
+  /healthz:
+    get:
+      summary: Liveness and synthetic marker
+      operationId: get__healthz
+      description: ''
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: &id001
+                    type: boolean
+                  synthetic: *id001
+                additionalProperties: false
+        '429':
+          $ref: '#/components/responses/Error'
+      security: []
+  /v1/auth/adult:
+    post:
+      summary: Owner-controlled synthetic adult session
+      operationId: post__v1_auth_adult
+      description: No phone/SMS adapter. The operator supplies the bootstrap secret
+        out of band; there is exactly one seeded adult.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bootstrapSecret:
+                  type: string
+                  minLength: 32
+                deviceName:
+                  type: string
+                  maxLength: 80
+              additionalProperties: false
+              required:
+              - bootstrapSecret
+  /v1/auth/logout:
+    post:
+      summary: Revoke this session and close its SSE streams
+      operationId: post__v1_auth_logout
+      description: Keeps family, identities, balances and history. If last live child
+        session, access becomes revoked.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OK'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /v1/snapshot:
+    get:
+      summary: Current authorized snapshot
+      operationId: get__v1_snapshot
+      description: Adult sees its entire synthetic family, including archived membership/history.
+        Adult preferences are always included, even with zero children. Child sees
+        only self and own operations; preferences are omitted entirely from child
+        snapshots.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /v1/preferences/family-intro/complete:
+    post:
+      summary: Adult completes the family introduction once
+      operationId: post__v1_preferences_family_intro_complete
+      description: Records familyIntroSeen=true for the permanent adult actor, independently
+        of child count or membership. Persists across logout, sessions, devices and
+        server restart. First completion atomically increments revision and publishes
+        scoped SSE snapshots; retries return the current adult snapshot without another
+        commit or revision. Children cannot read or change adult preferences. No reset
+        endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              maxProperties: 0
+      responses:
+        '200':
+          description: Current adult snapshot with preferences.familyIntroSeen=true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /v1/children:
+    get:
+      summary: Authorized child list
+      operationId: get__v1_children
+      description: ''
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+    post:
+      summary: Adult creates synthetic child draft
+      operationId: post__v1_children
+      description: 'Maximum 100 records including archived. No seed children. Identity
+        entry does not verify or open products. Optional idempotencyKey8–80 persists
+        actor-scoped create result: same original payload/key returns200 same child
+        after restart/relogin; different payload409. No duplicate profile when response
+        is lost.'
+      responses:
+        '201': &id002
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '200': *id002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildCreate'
+  /v1/children/{id}:
+    get:
+      summary: Read authorized child
+      operationId: get__v1_children_id
+      description: ''
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      summary: Adult edits draft/nickname/card state
+      operationId: patch__v1_children_id
+      description: Signed legal identity is immutable through this command. Nickname
+        changes never alter verification.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildPatch'
+  /v1/children/{id}/policy:
+    patch:
+      summary: Adult replaces family policy
+      operationId: patch__v1_children_id_policy
+      description: Amounts are minor BYN. Monthly limit must be >= daily. Omitted
+        categories preserve prior map; provided map is a replacement. Missing provided
+        map entries are disabled. Mandatory prohibited/unknown categories cannot be
+        enabled. transfers is saved but transfer commands do not exist.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Policy'
+  /v1/children/{id}/archive:
+    post:
+      summary: Adult ends family membership
+      operationId: post__v1_children_id_archive
+      description: Fails 409 pending_family_obligations before any state/session mutation
+        while goals contain money, work holds remain, or incurred reimbursement is
+        unsettled. Explicitly settle, return or cancel before archive; no silent forfeiture.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/children/{id}/verification:
+    post:
+      summary: Run explicit synthetic identity/representation outcome
+      operationId: post__v1_children_id_verification
+      description: Adult-only demo adapter; not real KYC. verified requires legalName
+        and sets representation synthetic_verified. Other outcomes unverify representation.
+        Agreement/account/card remain independent.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                outcome:
+                  type: string
+                  enum:
+                  - pending
+                  - needs_correction
+                  - rejected
+                  - verified
+              additionalProperties: false
+              required:
+              - outcome
+  /v1/children/{id}/product:
+    post:
+      summary: Record synthetic signer consent and activate synthetic product
+      operationId: post__v1_children_id_product
+      description: Requires verified identity and synthetic_verified representation.
+        Records adult signer ID/version/time. Produces synthetic_signed, synthetic_open,
+        active. Retry returns prior record. Not a real signature, bank account or
+        card issuance.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Child'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agreementVersion:
+                  type: string
+                  enum:
+                  - synthetic-v1
+                signerConsent:
+                  type: boolean
+                  const: true
+              additionalProperties: false
+              required:
+              - agreementVersion
+              - signerConsent
+  /v1/children/{id}/operations:
+    post:
+      summary: Create own synthetic purchase
+      operationId: post__v1_children_id_operations
+      description: Adult or own child. Validates active product, paired access, current
+        identity/membership, permissions, channel/category, balance and UTC day/month
+        execution totals. Above approval threshold stays pending with no debit. Same
+        command retry returns 200 and original operation; differing body same key
+        returns409.
+      responses:
+        '201': &id003
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '200': *id003
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseCommand'
+  /v1/children/{id}/topups:
+    post:
+      summary: Adult adds synthetic funds
+      operationId: post__v1_children_id_topups
+      description: Adult-only transfer from the finite synthetic adult wallet to child
+        available funds. Insufficient adult balance is a conflict. No money minting.
+        Existing idempotency and signed product checks remain.
+      responses:
+        '201': &id004
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+        '200': *id004
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoneyCommand'
+  /v1/operations/{id}/decision:
+    post:
+      summary: Adult decides pending purchase exactly once
+      operationId: post__v1_operations_id_decision
+      description: Approval repeats all current guards and applies debit/status/version
+        in one transaction. Same terminal decision retry returns prior result; opposite
+        decision409. Rejection cannot change prior terminal result.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operation'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                approve: *id001
+              additionalProperties: false
+              required:
+              - approve
+  /v1/pairings:
+    post:
+      summary: Create short-lived waiting-device challenge
+      operationId: post__v1_pairings
+      description: Two-minute TTL. QR format used by app moby-family:pair:<code>.
+        QR has no identity or session token. requestSecret goes only to initiating
+        device.
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairCreated'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deviceName:
+                  type: string
+                  maxLength: 80
+              additionalProperties: false
+  /v1/pairings/consume:
+    post:
+      summary: Adult explicitly assigns challenge to selected child
+      operationId: post__v1_pairings_consume
+      description: Only waiting challenge before TTL. Concurrent/replay consume returns409;
+        exactly one child assignment. Case-insensitive manual code.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairConsumed'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                childId:
+                  type: string
+              additionalProperties: false
+              required:
+              - code
+              - childId
+  /v1/pairings/{id}/poll:
+    post:
+      summary: Original waiting device retrieves child session
+      operationId: post__v1_pairings_id_poll
+      description: Before approval waiting. After approval creates one session atomically.
+        Same original secret retries return the same session/token until original
+        TTL, including after server restart; never mint a second session. Revoked
+        session cannot be recovered. Wrong secret404, expired410.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PairPoll'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      security: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairSecret'
+  /v1/pairings/{id}/cancel:
+    post:
+      summary: Original device cancels waiting or approved challenge
+      operationId: post__v1_pairings_id_cancel
+      description: Delivered challenge cannot be cancelled here. Revoke session separately.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - cancelled
+                additionalProperties: false
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      security: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PairSecret'
+  /v1/sessions:
+    get:
+      summary: Adult lists device sessions without credential hashes
+      operationId: get__v1_sessions
+      description: ''
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionInfo'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /v1/sessions/{id}/revoke:
+    post:
+      summary: Adult revokes exactly this device session
+      operationId: post__v1_sessions_id_revoke
+      description: Immediately closes its SSE and blocks REST/pair-delivery retry;
+        other child devices and family persist.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OK'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+  /v1/events:
+    get:
+      summary: Scoped SSE snapshots with revisions
+      operationId: get__v1_events
+      description: 'Authorization Bearer header required. Initial/reconnect always
+        returns current permitted full snapshot regardless of Last-Event-ID. id: revision,
+        event: snapshot, data: JSON Snapshot. Post-commit notifications; keepalive
+        snapshot every10seconds. Revocation/logout/membership loss closes stream.
+        No query-string token. No replay log; authoritative snapshot prevents missed
+        state.'
+      responses:
+        '200':
+          description: SSE scoped snapshots
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '410':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /v1/family-space/commands:
+    post:
+      summary: Role-scoped atomic synthetic family money command
+      operationId: postFamilySpaceCommand
+      description: See family-space-v2-contract.md for actors, action transition guards
+        and command-specific fields. One adult finite wallet; child/sibling privacy;
+        no real money. Idempotency keys are actor-scoped; same key with changed command
+        is conflict. Success is full current scoped snapshot.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FamilySpaceCommand'
+      responses:
+        '200':
+          description: Command applied or safe idempotent replay
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '403':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '409':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    Error:
+      description: Bounded error response; no secrets or PII. 400 invalid command,401
+        invalid/revoked/expired session,403 role/ownership,404 absent resource/wrong
+        pairing secret,409 business state/conflict,410 pairing expired,429 rate/capacity,500
+        storage. Error code is in error field.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      additionalProperties: false
+      required:
+      - error
+    Actor:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum:
+          - adult
+          - child
+        childId:
+          type: string
+        sessionId:
+          type: string
+      additionalProperties: false
+      required:
+      - id
+      - role
+      - sessionId
+    Session:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Opaque 256-bit bearer credential. Never put in QR, URL or logs.
+        actor:
+          $ref: '#/components/schemas/Actor'
+        expiresAt:
+          type: integer
+          format: int64
+          description: Unix seconds
+      additionalProperties: false
+      required:
+      - token
+      - actor
+      - expiresAt
+    Policy:
+      type: object
+      properties:
+        payments: *id001
+        transfers: *id001
+        internet: *id001
+        dailyLimit:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 10000000
+        monthlyLimit:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 100000000
+        approvalThreshold:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 10000000
+        categories:
+          type: object
+          properties:
+            food: *id001
+            transport: *id001
+            entertainment: *id001
+            other: *id001
+          additionalProperties: false
+      additionalProperties: false
+      required:
+      - payments
+      - transfers
+      - internet
+      - dailyLimit
+      - monthlyLimit
+      - approvalThreshold
+    ChildInput:
+      type: object
+      properties:
+        displayName: &id005
+          type: string
+          minLength: 1
+          maxLength: 100
+        legalName: &id006
+          type: string
+          maxLength: 200
+        dateOfBirth: &id007
+          type: string
+          format: date
+          description: Synthetic date, age 7–17 on server businessDate.
+      additionalProperties: false
+      required:
+      - displayName
+      - dateOfBirth
+    ChildPatch:
+      type: object
+      properties:
+        displayName: *id005
+        legalName: *id006
+        dateOfBirth: *id007
+        cardStatus:
+          type: string
+          enum:
+          - none
+          - blocked
+          - active
+          description: active requires verified identity, synthetic signed agreement
+            and open synthetic account. Signed legalName/DOB are locked; nickname
+            remains editable.
+      additionalProperties: false
+    Child:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName: *id005
+        legalName: *id006
+        dateOfBirth: *id007
+        identityStatus:
+          type: string
+          enum:
+          - draft
+          - pending
+          - needs_correction
+          - rejected
+          - verified
+        representationStatus:
+          type: string
+          enum:
+          - unverified
+          - synthetic_verified
+        agreementStatus:
+          type: string
+          enum:
+          - not_signed
+          - synthetic_signed
+        accountStatus:
+          type: string
+          enum:
+          - not_opened
+          - synthetic_open
+        cardStatus:
+          type: string
+          enum:
+          - none
+          - active
+          - blocked
+        deviceAccessStatus:
+          type: string
+          enum:
+          - unpaired
+          - paired
+          - revoked
+        membershipStatus:
+          type: string
+          enum:
+          - active
+          - archived
+        policy:
+          $ref: '#/components/schemas/Policy'
+        balanceMinor:
+          type: integer
+          format: int64
+          minimum: 0
+        currency:
+          type: string
+          enum:
+          - BYN
+        version:
+          type: integer
+          format: int64
+        agreementVersion:
+          type: string
+        signerId:
+          type: string
+        signedAt:
+          type: integer
+          format: int64
+      additionalProperties: false
+      required:
+      - id
+      - displayName
+      - legalName
+      - dateOfBirth
+      - identityStatus
+      - representationStatus
+      - agreementStatus
+      - accountStatus
+      - cardStatus
+      - deviceAccessStatus
+      - membershipStatus
+      - policy
+      - balanceMinor
+      - currency
+      - version
+    MoneyCommand:
+      type: object
+      properties: &id008
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 10000000
+        currency:
+          type: string
+          enum:
+          - BYN
+        channel:
+          type: string
+          enum:
+          - pos
+          - internet
+        category:
+          type: string
+          enum:
+          - food
+          - transport
+          - entertainment
+          - other
+          default: other
+        merchant:
+          type: string
+          maxLength: 100
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 80
+          description: Stable actor-wide unique command key; reuse same body to retry
+            across session renewal.
+      additionalProperties: false
+      required:
+      - amountMinor
+      - currency
+      - idempotencyKey
+    PurchaseCommand:
+      type: object
+      properties: *id008
+      additionalProperties: false
+      required:
+      - amountMinor
+      - currency
+      - channel
+      - idempotencyKey
+    Operation:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        kind:
+          type: string
+          enum:
+          - purchase
+          - topup
+        amountMinor:
+          type: integer
+          format: int64
+        currency:
+          type: string
+          enum:
+          - BYN
+        channel:
+          type: string
+        category:
+          type: string
+        merchant:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - done
+          - declined
+        createdAt:
+          type: integer
+          format: int64
+          description: Intent creation Unix seconds
+        completedAt:
+          type: integer
+          format: int64
+          description: Actual execution Unix seconds. Limits count this timestamp
+            in UTC.
+        version:
+          type: integer
+          format: int64
+        decision: *id001
+      additionalProperties: false
+      required:
+      - id
+      - childId
+      - kind
+      - amountMinor
+      - currency
+      - channel
+      - category
+      - merchant
+      - status
+      - createdAt
+      - version
+    AdultPreferences:
+      type: object
+      description: Preferences owned by the permanent adult actor; never included
+        for children.
+      properties:
+        familyIntroSeen:
+          type: boolean
+          default: false
+          description: Completed explanatory family introduction. Independent of child
+            count; existing persisted states without preferences default to false.
+      additionalProperties: false
+      required:
+      - familyIntroSeen
+    Snapshot:
+      type: object
+      properties:
+        revision:
+          type: integer
+          format: int64
+        actor:
+          $ref: '#/components/schemas/Actor'
+        preferences:
+          description: Always present for adult actors and omitted entirely for child
+            actors.
+          $ref: '#/components/schemas/AdultPreferences'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Child'
+        operations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operation'
+        synthetic:
+          type: boolean
+          const: true
+        businessDate:
+          type: string
+          format: date
+        familySpace:
+          $ref: '#/components/schemas/FamilySpace'
+      additionalProperties: false
+      required:
+      - revision
+      - actor
+      - children
+      - operations
+      - synthetic
+      - businessDate
+      - familySpace
+      allOf:
+      - if:
+          properties:
+            actor:
+              properties:
+                role:
+                  const: adult
+        then:
+          required:
+          - preferences
+        else:
+          not:
+            required:
+            - preferences
+    PairCreated:
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+          pattern: ^[0-9A-F]{12}$
+          description: Only public one-time challenge in QR/manual fallback; never
+            include requestSecret.
+        requestSecret:
+          type: string
+          description: Original waiting device secret; retain privately until completion.
+        expiresAt:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - waiting
+      additionalProperties: false
+      required:
+      - id
+      - code
+      - requestSecret
+      - expiresAt
+      - status
+    PairSecret:
+      type: object
+      properties:
+        requestSecret:
+          type: string
+      additionalProperties: false
+      required:
+      - requestSecret
+    PairPoll:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - waiting
+          - approved
+          - delivered
+          - cancelled
+        session:
+          $ref: '#/components/schemas/Session'
+      additionalProperties: false
+      required:
+      - status
+    PairConsumed:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+          - approved
+        childId:
+          type: string
+      additionalProperties: false
+      required:
+      - id
+      - status
+      - childId
+    SessionInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum:
+          - adult
+          - child
+        childId:
+          type: string
+        deviceName:
+          type: string
+        expiresAt:
+          type: integer
+          format: int64
+        revoked: *id001
+      additionalProperties: false
+      required:
+      - id
+      - role
+      - childId
+      - deviceName
+      - expiresAt
+      - revoked
+    OK:
+      type: object
+      properties:
+        ok: *id001
+      additionalProperties: false
+      required:
+      - ok
+    ChildCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        displayName: *id005
+        legalName: *id006
+        dateOfBirth: *id007
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 80
+          description: Optional backwards-compatible retry key; clients should always
+            persist and send it. Stable adult actor scope across restart/relogin.
+      required:
+      - displayName
+      - dateOfBirth
+    FamilyWallet:
+      type: object
+      properties:
+        availableMinor:
+          type: integer
+          format: int64
+        reservedMinor:
+          type: integer
+          format: int64
+        currency:
+          type: string
+          const: BYN
+      required:
+      - availableMinor
+      - reservedMinor
+      - currency
+      additionalProperties: false
+    FamilyGoal:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        title:
+          type: string
+        matchingStatus:
+          type: string
+        targetMinor:
+          type: integer
+          format: int64
+        savedMinor:
+          type: integer
+          format: int64
+        matchedMinor:
+          type: integer
+          format: int64
+        netDepositsMinor:
+          type: integer
+          format: int64
+          description: Nonnegative display value max(0,savedMinor-lifetime matchedMinor).
+            Matching eligibility separately retains the signed conserved position
+            and never recycles withdrawn matching rewards.
+        matchedBasisMinor:
+          type: integer
+          format: int64
+        matchingAvailableMinor:
+          type: integer
+          format: int64
+      required:
+      - id
+      - childId
+      - title
+      - matchingStatus
+      - targetMinor
+      - savedMinor
+      - matchedMinor
+      - netDepositsMinor
+      - matchedBasisMinor
+      - matchingAvailableMinor
+      additionalProperties: false
+    FamilyTask:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+        rewardMinor:
+          type: integer
+          format: int64
+        cancelRequested:
+          type: boolean
+        cancelReason:
+          type: string
+      required:
+      - id
+      - childId
+      - title
+      - status
+      - rewardMinor
+      - cancelRequested
+      additionalProperties: false
+    FamilyErrand:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        title:
+          type: string
+        funding:
+          type: string
+        status:
+          type: string
+        budgetMinor:
+          type: integer
+          format: int64
+        rewardMinor:
+          type: integer
+          format: int64
+        actualMinor:
+          type: integer
+          format: int64
+        returnedMinor:
+          type: integer
+          format: int64
+        ownMoneyConsent:
+          type: boolean
+        cancelRequested:
+          type: boolean
+        returnConfirmed:
+          type: boolean
+        expenseRecorded:
+          type: boolean
+        cancelReason:
+          type: string
+        rewardReserved:
+          type: boolean
+      required:
+      - id
+      - childId
+      - title
+      - funding
+      - status
+      - budgetMinor
+      - rewardMinor
+      - actualMinor
+      - returnedMinor
+      - ownMoneyConsent
+      - cancelRequested
+      - returnConfirmed
+      - expenseRecorded
+      - rewardReserved
+      additionalProperties: false
+    FamilyAllowance:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        title:
+          type: string
+        frequency:
+          type: string
+        nextDate:
+          type: string
+        amountMinor:
+          type: integer
+          format: int64
+        monthDay:
+          type: integer
+          format: int64
+        retryLimit:
+          type: integer
+          format: int64
+        weekdays:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+        active:
+          type: boolean
+      required:
+      - id
+      - childId
+      - title
+      - frequency
+      - nextDate
+      - amountMinor
+      - monthDay
+      - retryLimit
+      - weekdays
+      - active
+      additionalProperties: false
+    FamilyInstallment:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        allowanceId:
+          type: string
+        dueDate:
+          type: string
+        status:
+          type: string
+        lastAttemptDate:
+          type: string
+        amountMinor:
+          type: integer
+          format: int64
+        attempts:
+          type: integer
+          format: int64
+        retryLimit:
+          type: integer
+          minimum: 0
+          maximum: 3
+          description: Frozen when this installment is created; subsequent schedule
+            edits do not alter it.
+      required:
+      - id
+      - childId
+      - allowanceId
+      - dueDate
+      - status
+      - amountMinor
+      - attempts
+      additionalProperties: false
+    FamilySettings:
+      type: object
+      properties:
+        matchingEnabled:
+          type: boolean
+        notifications:
+          type: boolean
+        tasksEnabled:
+          type: boolean
+        errandsEnabled:
+          type: boolean
+        learningEnabled:
+          type: boolean
+        matchingPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        matchingCapMinor:
+          type: integer
+          minimum: 0
+          maximum: 10000000
+      required:
+      - matchingEnabled
+      - notifications
+      - tasksEnabled
+      - errandsEnabled
+      - learningEnabled
+      - matchingPercent
+      - matchingCapMinor
+      additionalProperties: false
+    FamilyRequest:
+      type: object
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        title:
+          type: string
+        kind:
+          type: string
+        status:
+          type: string
+        policy:
+          $ref: '#/components/schemas/Policy'
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 0
+      required:
+      - id
+      - childId
+      - title
+      - kind
+      - status
+      additionalProperties: false
+    FamilyLesson:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        skill:
+          type: string
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - title
+      - body
+      - skill
+      - question
+      - options
+      additionalProperties: false
+    FamilyLessonCompletion:
+      type: object
+      properties:
+        childId:
+          type: string
+        lessonId:
+          type: string
+        completedAt:
+          type: integer
+          format: int64
+      required:
+      - childId
+      - lessonId
+      - completedAt
+      additionalProperties: false
+    FamilyWeekly:
+      type: object
+      properties:
+        childId:
+          type: string
+        since:
+          type: string
+        incomingMinor:
+          type: integer
+          format: int64
+        spentMinor:
+          type: integer
+          format: int64
+        savedMinor:
+          type: integer
+          format: int64
+        tasksCompleted:
+          type: integer
+          format: int64
+        lessonsCompleted:
+          type: integer
+          format: int64
+      required:
+      - childId
+      - since
+      - incomingMinor
+      - spentMinor
+      - savedMinor
+      - tasksCompleted
+      - lessonsCompleted
+      additionalProperties: false
+    FamilyCapabilities:
+      type: object
+      properties:
+        synthetic:
+          type: boolean
+          const: true
+        currency:
+          type: string
+          const: BYN
+        timeZone:
+          type: string
+          const: Europe/Minsk
+        maxAmountMinor:
+          type: integer
+          const: 10000000
+        matchingCapPeriod:
+          type: string
+          const: goal_lifetime
+        lessonsGrantPermissions:
+          type: boolean
+          const: false
+      required:
+      - synthetic
+      - currency
+      - timeZone
+      - maxAmountMinor
+      - matchingCapPeriod
+      - lessonsGrantPermissions
+      additionalProperties: false
+    FamilySpace:
+      type: object
+      properties:
+        adultWallet:
+          $ref: '#/components/schemas/FamilyWallet'
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyGoal'
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyTask'
+        errands:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyErrand'
+        allowances:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyAllowance'
+        installments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyInstallment'
+        requests:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyRequest'
+        settings:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/FamilySettings'
+        learning:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyLessonCompletion'
+        lessons:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyLesson'
+        weekly:
+          type: array
+          items:
+            $ref: '#/components/schemas/FamilyWeekly'
+        capabilities:
+          $ref: '#/components/schemas/FamilyCapabilities'
+        notices:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpaceNotice'
+        activity:
+          type: array
+          maxItems: 200
+          description: Current actor scoped family entries, newest first, filtered
+            before limiting. Opening endowment adult-only; no legacy operations duplicated.
+          items:
+            $ref: '#/components/schemas/FamilySpaceEntry'
+      required:
+      - goals
+      - tasks
+      - errands
+      - allowances
+      - installments
+      - requests
+      - settings
+      - learning
+      - lessons
+      - weekly
+      - capabilities
+      - notices
+      - activity
+      additionalProperties: false
+    FamilySpaceCommand:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - goal.create
+          - goal.move
+          - goal.match
+          - task.create
+          - task.action
+          - errand.create
+          - errand.action
+          - allowance.create
+          - allowance.action
+          - settings.update
+          - request.create
+          - request.decide
+          - lesson.complete
+          - wallet.transfer
+          - notice.read
+          - card.block
+          - allowance.update
+        childId:
+          type: string
+        entityId:
+          type: string
+        title:
+          type: string
+        action:
+          type: string
+        idempotencyKey:
+          type: string
+          minLength: 8
+          maxLength: 80
+        funding:
+          type: string
+        frequency:
+          type: string
+        nextDate:
+          type: string
+        kind:
+          type: string
+        amountMinor:
+          type: integer
+          format: int64
+        budgetMinor:
+          type: integer
+          format: int64
+        rewardMinor:
+          type: integer
+          format: int64
+        targetMinor:
+          type: integer
+          format: int64
+        monthDay:
+          type: integer
+          format: int64
+        retryLimit:
+          type: integer
+          format: int64
+        ownMoneyConsent:
+          type: boolean
+        approve:
+          type: boolean
+        weekdays:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 6
+        settings:
+          $ref: '#/components/schemas/FamilySettings'
+        policy:
+          $ref: '#/components/schemas/Policy'
+        answerIndex:
+          type: integer
+          minimum: 0
+        reason:
+          type: string
+          maxLength: 240
+      required:
+      - type
+      - childId
+      - idempotencyKey
+      additionalProperties: false
+    SpaceNotice:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        recipient:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        kind:
+          type: string
+        createdAt:
+          type: integer
+          format: int64
+        read:
+          type: boolean
+        mandatory:
+          type: boolean
+      required:
+      - id
+      - childId
+      - recipient
+      - title
+      - body
+      - kind
+      - createdAt
+      - read
+      - mandatory
+    FamilySpaceEntry:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+        childId:
+          type: string
+        kind:
+          type: string
+        entityId:
+          type: string
+        amountMinor:
+          type: integer
+          format: int64
+        at:
+          type: integer
+          format: int64
+      required:
+      - id
+      - kind
+      - amountMinor
+      - at
