@@ -8,7 +8,7 @@
 - [ ] [knyazin47](https://github.com/knyazin47)
 - [ ] [lolmmmtech](https://github.com/lolmmmtech)
 - [ ] [zhalobitskaia](https://github.com/zhalobitskaia)
-- [ ] [koloideal](https://github.com/koloideal)
+- [x] [koloideal](https://github.com/koloideal) — family flow
 - [ ] [Armovit](https://github.com/Armovit)
 
 Чтобы отметиться, замените `[ ]` на `[x]` только в своей строке и отправьте
