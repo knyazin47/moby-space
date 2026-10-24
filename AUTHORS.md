@@ -7,7 +7,7 @@
 
 - [ ] [knyazin47](https://github.com/knyazin47)
 - [ ] [lolmmmtech](https://github.com/lolmmmtech)
-- [ ] [zhalobitskaia](https://github.com/zhalobitskaia)
+- [x] [zhalobitskaia](https://github.com/zhalobitskaia)
 - [x] [koloideal](https://github.com/koloideal) — family flow
 - [ ] [Armovit](https://github.com/Armovit)
 
