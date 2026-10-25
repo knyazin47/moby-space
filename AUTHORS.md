@@ -6,7 +6,7 @@
 Пустой checkbox означает, что такое подтверждение ещё ожидается.
 
 - [ ] [knyazin47](https://github.com/knyazin47)
-- [ ] [lolmmmtech](https://github.com/lolmmmtech)
+- [x] [lolmmmtech](https://github.com/lolmmmtech)
 - [x] [zhalobitskaia](https://github.com/zhalobitskaia)
 - [x] [koloideal](https://github.com/koloideal) — family flow
 - [ ] [Armovit](https://github.com/Armovit)
