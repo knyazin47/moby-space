@@ -5,7 +5,7 @@
 Галочка отмечает личное подтверждение участия через pull request.
 Пустой checkbox означает, что такое подтверждение ещё ожидается.
 
-- [ ] [knyazin47](https://github.com/knyazin47)
+- [x] [knyazin47](https://github.com/knyazin47)
 - [x] [lolmmmtech](https://github.com/lolmmmtech)
 - [x] [zhalobitskaia](https://github.com/zhalobitskaia)
 - [x] [koloideal](https://github.com/koloideal) — family flow
