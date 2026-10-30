@@ -9,7 +9,7 @@
 - [x] [lolmmmtech](https://github.com/lolmmmtech)
 - [x] [zhalobitskaia](https://github.com/zhalobitskaia)
 - [x] [koloideal](https://github.com/koloideal) — family flow
-- [ ] [Armovit](https://github.com/Armovit)
+- [x] [Armovit](https://github.com/Armovit)
 
 Чтобы отметиться, замените `[ ]` на `[x]` только в своей строке и отправьте
 изменение отдельным pull request. При желании добавьте рядом короткий комментарий
